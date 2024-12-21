@@ -1,0 +1,25 @@
+{% extends "catalog/base.html" %}
+
+{% block content %}
+<h2>Оформление заказа</h2>
+<form method="post">
+  {% csrf_token %}
+  <div>
+    <label for="address">Адрес доставки:</label>
+    <input type="text" name="address" id="address"/>
+  </div>
+  <div>
+    <label for="delivery_date">Дата доставки:</label>
+    <input type="date" name="delivery_date" id="delivery_date"/>
+  </div>
+  <div>
+    <label for="delivery_time">Время доставки:</label>
+    <input type="time" name="delivery_time" id="delivery_time"/>
+  </div>
+  <div>
+    <label for="comment">Комментарий:</label>
+    <textarea name="comment" id="comment"></textarea>
+  </div>
+  <button type="submit">Подтвердить заказ</button>
+</form>
+{% endblock %}

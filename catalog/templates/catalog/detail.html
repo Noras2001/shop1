@@ -1,0 +1,16 @@
+{% extends "catalog/base.html" %}
+
+
+
+{% block content %}
+  <h1>{{ product.name }}</h1>
+  {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" width="300">
+  {% endif %}
+  <p>{{ product.description }}</p>
+  <p>Price: {{ product.price }}</p>
+  <p>Stock: {{ product.stock }}</p>
+  <p>{% if product.available %}Available{% else %}Out of Stock{% endif %}</p>
+  <a href="{% url 'cart:add_to_cart' product.id %}">В корзину</a>
+{% endblock %}
+

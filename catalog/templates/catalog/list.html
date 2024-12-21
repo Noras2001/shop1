@@ -1,0 +1,26 @@
+{% extends "catalog/base.html" %}
+
+
+
+{% block content %}
+  <h1>{% if category %}{{ category.name }}{% else %}All Products{% endif %}</h1>
+  <ul>
+    {% for category in categories %}
+      <li><a href="{% url 'catalog:product_list_by_category' category.slug %}">{{ category.name }}</a></li>
+    {% endfor %}
+  </ul>
+  <ul>
+    {% for product in products %}
+      <li>
+        <a href="{% url 'catalog:product_detail' product.id product.slug %}">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" width="100">
+          {% endif %}
+          {{ product.name }}
+        </a>
+        - {{ product.price }}
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}
+

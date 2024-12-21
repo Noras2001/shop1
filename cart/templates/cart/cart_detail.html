@@ -1,0 +1,19 @@
+{% extends "catalog/base.html" %}
+{% block content %}
+<h2>Ваша корзина</h2>
+<table>
+    <tr>
+        <th>Товар</th>
+        <th>Количество</th>
+        <th>Цена</th>
+    </tr>
+    {% for item in items %}
+    <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.quantity }}</td>
+        <td>{{ item.product.price|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<p>Общая сумма: {{ total|floatformat:2 }}</p>
+{% endblock %}
