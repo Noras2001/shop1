@@ -1,10 +1,21 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from django.utils import timezone
 from .models import Order, OrderItem
 from cart.models import Cart
 from .forms import OrderForm
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.shortcuts import get_object_or_404, render, redirect
+from aiogram import Bot
+from aiogram.client.bot import DefaultBotProperties
+from aiogram.enums import ParseMode
+import asyncio
+import os
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
 
 @login_required
 def create_order(request):
@@ -34,45 +45,58 @@ def create_order(request):
                     price=item.product.price
                 )
 
-            # No borramos el carrito aún si quieres permitir
-            # al usuario volver atrás. Pero si deseas vaciarlo
-            # aquí, hazlo.
-
             return redirect('orders:order_confirm', order_id=order.id)
         else:
-            # Formulario no válido => errores
             return render(request, 'orders/order_form.html', {'form': form})
     else:
-        # GET: formulario vacío
         form = OrderForm()
         return render(request, 'orders/order_form.html', {'form': form})
+
+
+async def send_telegram_notification(order):
+    """
+    Enviar notificación del pedido por Telegram.
+    """
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        raise ValueError("El TOKEN o el CHAT_ID no están configurados.")
+
+    bot = Bot(
+        token=TELEGRAM_BOT_TOKEN,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
+
+    # Formatea el mensaje con la información del pedido
+    message = (
+        f"Новый заказ #{order.id}!\n"
+        f"Адрес доставки: {order.address}\n"
+        f"Дата: {order.delivery_date}\n"
+        f"Время: {order.delivery_time}\n"
+        f"Комментарий: {order.comment}\n"
+        f"Сумма: {order.total:.2f} руб.\n"
+    )
+
+    await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
 
 
 @login_required
 def order_confirm(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
 
-    # Si ya está confirmado, tal vez quieras redirigir a success directamente:
-    if order.is_confirmed:
-        return redirect('orders:order_success', order_id=order_id)
-
     if request.method == 'POST':
-        # El usuario hizo clic en “Подтвердить заказ”
         order.is_confirmed = True
         order.save()
-        return redirect('orders:order_success', order_id=order_id)
 
-    # GET -> mostrar un resumen
-    items = order.items.select_related('product')
-    context = {
-        'order': order,
-        'items': items
-    }
-    return render(request, 'orders/order_confirm.html', context)
+        try:
+            asyncio.run(send_telegram_notification(order))
+        except Exception as e:
+            print(f"Error enviando notificación: {e}")
+
+        return redirect('orders:order_success', order_id=order.id)
+
+    return render(request, 'orders/order_confirm.html', {'order': order})
+
 
 @login_required
 def order_success(request, order_id):
-    # Mostrar la pantalla de confirmación
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'orders/order_success.html', {'order': order})
-
