@@ -1,9 +1,8 @@
-# orders/forms.py
-
 from django import forms
 from .models import Order
-from datetime import datetime, time
+from datetime import datetime
 from django.utils import timezone
+
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -17,6 +16,14 @@ class OrderForm(forms.ModelForm):
             'email',
             'payment_method',
         ]
+        widgets = {
+            'delivery_date': forms.DateInput(
+                attrs={'type': 'date', 'min': timezone.localdate().isoformat()}
+            ),
+            'delivery_time': forms.TimeInput(
+                attrs={'type': 'time'}
+            ),
+        }
         # Opcionalmente, puedes definir etiquetas (labels) y help_texts
         labels = {
             'address': 'Адрес доставки',

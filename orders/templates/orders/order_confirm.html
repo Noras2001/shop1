@@ -3,6 +3,15 @@
 {% block content %}
 <h2>Подтверждение заказа (Шаг 2)</h2>
 
+{% if order.is_confirmed %}
+  <p>Этот заказ уже подтвержден.</p>
+  <a href="{% url 'orders:order_success' order.id %}">Перейти к успеху</a>
+{% else %}
+  <p>Проверьте данные заказа перед подтверждением.</p>
+
+{% endif %}
+
+
 <p>Адрес доставки: {{ order.address }}</p>
 <p>Дата: {{ order.delivery_date }}</p>
 <p>Время: {{ order.delivery_time }}</p>
@@ -26,3 +35,9 @@
 <a href="{% url 'orders:create_order' %}">Вернуться</a>
 
 {% endblock %}
+
+
+
+
+
+

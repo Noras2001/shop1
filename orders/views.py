@@ -4,6 +4,7 @@ from django.utils import timezone
 from .models import Order, OrderItem
 from cart.models import Cart
 from .forms import OrderForm
+from django.contrib.auth.decorators import login_required
 
 @login_required
 def create_order(request):
@@ -46,26 +47,28 @@ def create_order(request):
         form = OrderForm()
         return render(request, 'orders/order_form.html', {'form': form})
 
+
 @login_required
 def order_confirm(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
 
+    # Si ya está confirmado, tal vez quieras redirigir a success directamente:
+    if order.is_confirmed:
+        return redirect('orders:order_success', order_id=order_id)
+
     if request.method == 'POST':
-        # El usuario confirma definitivamente la orden
-        # Vaciar el carrito, si no lo hiciste antes
-        cart = Cart.objects.filter(user=request.user).first()
-        if cart:
-            cart.delete()
+        # El usuario hizo clic en “Подтвердить заказ”
+        order.is_confirmed = True
+        order.save()
+        return redirect('orders:order_success', order_id=order_id)
 
-        return redirect('orders:order_success', order_id=order.id)
-
-    # GET: muestra resumen para confirmación
-    # Podrías mostrar en la plantilla:
-    # - Dirección, fecha/hora
-    # - Ítems
-    # - Total
-    return render(request, 'orders/order_confirm.html', {'order': order})
-
+    # GET -> mostrar un resumen
+    items = order.items.select_related('product')
+    context = {
+        'order': order,
+        'items': items
+    }
+    return render(request, 'orders/order_confirm.html', context)
 
 @login_required
 def order_success(request, order_id):
