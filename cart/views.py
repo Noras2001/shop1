@@ -1,7 +1,22 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from .models import Cart, CartItem, Product
+from django.contrib.auth.decorators import login_required
 
-from catalog.models import Product
-from .models import Cart, CartItem
+@login_required
+def update_cart_item(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+
+    if request.method == 'POST':
+        new_quantity = request.POST.get('quantity')
+        if new_quantity and int(new_quantity) > 0:
+            cart_item.quantity = int(new_quantity)
+            cart_item.save()
+        else:
+            # Si la cantidad es 0 o negativa, puedes eliminar el item
+            cart_item.delete()
+
+    return redirect('cart:cart_detail')
+
 
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)

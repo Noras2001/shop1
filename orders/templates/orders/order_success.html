@@ -1,0 +1,9 @@
+{{% extends "catalog/base.html" %}
+{% block content %}
+<h2>Заказ оформлен! (Шаг 3)</h2>
+<p>Спасибо за заказ! Ваш номер заказа: {{ order.id }}</p>
+<p>Мы свяжемся с Вами в ближайшее время.</p>
+<a href="{% url 'catalog:product_list' %}">Вернуться к каталогу</a>
+{% endblock %}
+
+

@@ -1,0 +1,28 @@
+<!-- orders/templates/orders/order_confirm.html -->
+{% extends "catalog/base.html" %}
+{% block content %}
+<h2>Подтверждение заказа (Шаг 2)</h2>
+
+<p>Адрес доставки: {{ order.address }}</p>
+<p>Дата: {{ order.delivery_date }}</p>
+<p>Время: {{ order.delivery_time }}</p>
+<p>Комментарий: {{ order.comment }}</p>
+<p>Итого: {{ order.total }}</p>
+
+<!-- Lista de items, por ejemplo -->
+<ul>
+{% for item in order.orderitem_set.all %}
+  <li>{{ item.product.name }} x {{ item.quantity }} = {{ item.price|floatformat:2 }}</li>
+{% endfor %}
+</ul>
+
+<!-- Botón para confirmar definitivamente -->
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Подтвердить заказ</button>
+</form>
+
+<!-- Opcional: un enlace para volver a editar o cancelar -->
+<a href="{% url 'orders:create_order' %}">Вернуться</a>
+
+{% endblock %}
