@@ -1,47 +1,66 @@
 import asyncio
 from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
-from aiogram.types import Message
-from aiogram.filters import Command
-from aiogram import Router
-from aiogram.client.session.aiohttp import AiohttpSession
-from aiogram.client.bot import DefaultBotProperties
-
-# Carga del token desde .env
-from dotenv import load_dotenv
-import os
-
-load_dotenv()
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-
-# Inicialización del bot con propiedades predeterminadas
-bot = Bot(
-    token=TELEGRAM_BOT_TOKEN,
-    session=AiohttpSession(),
-    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-)
-
-# Crear Router
-router = Router()
+from aiogram.types import InputFile
+import asyncio
+from aiogram import Bot, Dispatcher
+from aiogram.types import InputFile
+from api import app  # Importar la app de FastAPI
+import uvicorn
 
 
-# Handler de comandos
-@router.message(Command("start"))
-async def send_welcome(message: Message):
-    await message.reply("Привет! Я ваш бот для магазина цветов. Чем могу помочь?")
 
+# Reemplaza 'YOUR_BOT_TOKEN' con el token que obtuviste de BotFather
+BOT_TOKEN = '8142502168:AAGxuFLlmu_oFeG23TV4W4nV9yg6VTL8Va4'
+
+# Reemplaza con el ID de chat donde quieres recibir los pedidos
+CHAT_ID = '1109953581'
+
+# Inicializar el bot y el dispatcher
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
+
+async def send_order(order):
+    """
+    Función para enviar el pedido a Telegram.
+    :param order: Diccionario con detalles del pedido
+    """
+    try:
+        # Construir el mensaje
+        message = f"📦 **Nuevo Pedido Recibido** 📦\n\n"
+        message += f"**Bouquet(s):**\n"
+        for bouquet in order['bouquets']:
+            message += f"• {bouquet['name']} - ${bouquet['price']}\n"
+        message += f"\n**Costo Total:** ${order['total']}\n"
+        message += f"**Fecha de Entrega:** {order['delivery_date']}\n"
+        message += f"**Hora de Entrega:** {order['delivery_time']}\n"
+        message += f"**Lugar de Entrega:** {order['delivery_address']}\n"
+        if order.get('comments'):
+            message += f"**Comentarios:** {order['comments']}\n"
+
+        # Enviar el mensaje
+        await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode='Markdown')
+
+        # Enviar imágenes de los bouquets
+        for bouquet in order['bouquets']:
+            if bouquet.get('image_path'):
+                photo = InputFile(bouquet['image_path'])
+                await bot.send_photo(chat_id=CHAT_ID, photo=photo, caption=bouquet['name'])
+
+        print("Pedido enviado exitosamente.")
+    except Exception as e:
+        print(f"Error al enviar el pedido: {e}")
+
+async def run_api():
+    config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_level="info")
+    server = uvicorn.Server(config)
+    await server.serve()
 
 async def main():
-    # Crear Dispatcher
-    dp = Dispatcher()
+    # Correr el bot y la API en paralelo
+    await asyncio.gather(
+        dp.start_polling(bot),
+        run_api(),
+    )
 
-    # Registrar el router
-    dp.include_router(router)
-
-    # Configuración del bot
-    await bot.delete_webhook(drop_pending_updates=True)
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     asyncio.run(main())

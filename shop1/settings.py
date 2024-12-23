@@ -39,6 +39,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'telegram_bot_myapp.apps.TelegramBotMyappConfig',
     'orders.apps.OrdersConfig',
     'cart.apps.CartConfig',
     'user.apps.UserConfig',
