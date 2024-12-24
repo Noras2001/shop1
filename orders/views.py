@@ -16,7 +16,6 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
-
 @login_required
 def create_order(request):
     cart = Cart.objects.filter(user=request.user).first()
@@ -36,14 +35,23 @@ def create_order(request):
             order.total = total
             order.save()
 
-            # Crear OrderItems
+            # Crear OrderItems con la imagen del producto
             for item in cart.items.select_related('product'):
+                if item.product.image:
+                    image_url = item.product.image.url
+                else:
+                    image_url = ''
+                print(f"Guardando OrderItem: Producto={item.product.name}, Imagen={image_url}")  # Debug
                 OrderItem.objects.create(
                     order=order,
                     product=item.product,
                     quantity=item.quantity,
-                    price=item.product.price
+                    price=item.product.price,
+                    product_image=image_url  # Guardar la URL de la imagen
                 )
+
+            # (Opcional) Limpiar el carrito después de crear el pedido
+            cart.items.all().delete()
 
             return redirect('orders:order_confirm', order_id=order.id)
         else:
@@ -51,7 +59,6 @@ def create_order(request):
     else:
         form = OrderForm()
         return render(request, 'orders/order_form.html', {'form': form})
-
 
 async def send_telegram_notification(order):
     """
