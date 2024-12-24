@@ -10,18 +10,27 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-from pathlib import Path
+import environ
 import os
-from dotenv import load_dotenv
-load_dotenv()
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-
-
-
+from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Define BASE_DIR como un objeto Path
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Inicializar environ
+env = environ.Env(
+    DEBUG=(bool, False)  # Valor por defecto de DEBUG
+)
+
+# Leer el archivo .env
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# Configurar las variables de entorno
+DEBUG = env('DEBUG')
+TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = env('TELEGRAM_CHAT_ID')
 
 
 # Quick-start development settings - unsuitable for production
@@ -39,7 +48,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'telegram_bot_myapp.apps.TelegramBotMyappConfig',
     'orders.apps.OrdersConfig',
     'cart.apps.CartConfig',
     'user.apps.UserConfig',
@@ -146,8 +154,34 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
 #LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/user/profile/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'orders': {  # Asegúrate de que 'orders' coincide con el nombre de tu aplicación
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
 
 
 

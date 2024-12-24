@@ -16,15 +16,22 @@ Including another URconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('orders/', include('orders.urls', namespace='orders')),
+    #path('orders/', include('orders.urls', namespace='orders')),
+    path('orders/', include(('orders.urls', 'orders'), namespace='orders')),
     path('cart/', include('cart.urls', namespace='cart')),
     path('', include('catalog.urls', namespace='catalog')),
     path('user/', include('user.urls', namespace='user')),
     path('bot/', include('telegram_bot_myapp.urls')),  # Ruta para la app del bot
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
 

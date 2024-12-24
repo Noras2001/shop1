@@ -24,7 +24,7 @@ class OrderForm(forms.ModelForm):
                 attrs={'type': 'time'}
             ),
         }
-        # Opcionalmente, puedes definir etiquetas (labels) y help_texts
+
         labels = {
             'address': 'Адрес доставки',
             'delivery_date': 'Дата доставки',

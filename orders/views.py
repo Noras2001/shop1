@@ -68,11 +68,14 @@ async def send_telegram_notification(order):
     # Formatea el mensaje con la información del pedido
     message = (
         f"Новый заказ #{order.id}!\n"
-        f"Адрес доставки: {order.address}\n"
+        f"Адрес доставки: {order.address}\n"        
         f"Дата: {order.delivery_date}\n"
         f"Время: {order.delivery_time}\n"
         f"Комментарий: {order.comment}\n"
         f"Сумма: {order.total:.2f} руб.\n"
+        f"Телефон: {order.phone}\n"
+        f"Email: {order.email}\n"
+        f"Способ оплаты: {order.payment_method}\n"
     )
 
     await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
