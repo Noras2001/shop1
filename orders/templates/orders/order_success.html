@@ -1,9 +1,17 @@
-{{% extends "catalog/base.html" %}
+{% extends "catalog/base.html" %}
+
 {% block content %}
-<h2>Заказ оформлен! (Шаг 3)</h2>
-<p>Спасибо за заказ! Ваш номер заказа: {{ order.id }}</p>
-<p>Мы свяжемся с Вами в ближайшее время.</p>
-<a href="{% url 'catalog:product_list' %}">Вернуться к каталогу</a>
+<div class="container py-4">
+  <div class="card mx-auto text-center" style="max-width: 600px;">
+    <div class="card-body">
+      <h2 class="mb-4 text-success">Заказ оформлен! (Шаг 3)</h2>
+      <p class="mb-3">Спасибо за заказ! Ваш номер заказа: <strong>{{ order.id }}</strong></p>
+      <p class="mb-4">Мы свяжемся с Вами в ближайшее время.</p>
+      <a href="{% url 'catalog:product_list' %}" class="btn btn-primary">Вернуться к каталогу</a>
+    </div>
+  </div>
+</div>
 {% endblock %}
+
 
 

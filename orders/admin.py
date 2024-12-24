@@ -2,7 +2,6 @@ from django.contrib import admin
 from .models import Order, OrderItem
 from django.utils.html import format_html
 
-
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     extra = 0
@@ -15,6 +14,9 @@ class OrderItemInline(admin.TabularInline):
         return "No Image"
     product_image_display.short_description = 'Изображение'
 
+
+
+
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'created_at', 'total', 'is_confirmed')
     inlines = [OrderItemInline]
@@ -22,7 +24,3 @@ class OrderAdmin(admin.ModelAdmin):
 admin.site.register(Order, OrderAdmin)
 
 
-#@admin.register(Order)
-#class OrderAdmin(admin.ModelAdmin):
-#    list_display = ('id', 'user', 'address', 'delivery_date', 'is_confirmed')
-#    list_filter = ('is_confirmed', 'delivery_date')

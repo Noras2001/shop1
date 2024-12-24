@@ -1,24 +1,36 @@
 <!-- list.html -->
 {% extends "catalog/base.html" %}
+
 {% block content %}
-  <h1>{% if category %}{{ category.name }}{% else %}All Products{% endif %}</h1>
-  <ul>
-    {% for category in categories %}
-      <li><a href="{% url 'catalog:product_list_by_category' category.slug %}">{{ category.name }}</a></li>
-    {% endfor %}
-  </ul>
-  <ul>
+<div class="container py-4">
+  <h1 class="mb-4">{% if category %}{{ category.name }}{% else %}Все букеты{% endif %}</h1>
+  <div class="row mb-3">
+    <div class="col text-center">
+      {% for category in categories %}
+        <a href="{% url 'catalog:product_list_by_category' category.slug %}"
+           class="btn btn-outline-success mx-2 mb-3">{{ category.name }}</a>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="row">
     {% for product in products %}
-      <li>
-        <a href="{% url 'catalog:product_detail' product.id product.slug %}">
-          {% if product.image %}
-            <img src="{{ product.image.url }}" alt="{{ product.name }}" width="100">
-          {% endif %}
-          {{ product.name }}
-        </a>
-        - {{ product.price }}
-      </li>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <a href="{% url 'catalog:product_detail' product.id product.slug %}">
+            {% if product.image %}
+              <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+            {% else %}
+              <img src="/static/images/placeholder.png" class="card-img-top" alt="No image available">
+            {% endif %}
+          </a>
+          <div class="card-body text-center">
+            <h5 class="card-title">{{ product.name }}</h5>
+            <p class="card-text">{{ product.price }} ₽</p>
+          </div>
+        </div>
+      </div>
     {% endfor %}
-  </ul>
+  </div>
+</div>
 {% endblock %}
 
