@@ -28,7 +28,6 @@ urlpatterns = [
     path('cart/', include('cart.urls', namespace='cart')),
     path('', include('catalog.urls', namespace='catalog')),
     path('user/', include('user.urls', namespace='user')),
-    path('bot/', include('telegram_bot_myapp.urls')),  # Ruta para la app del bot
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
