@@ -1,3 +1,8 @@
+# shop1/orders/views.py
+import asyncio
+import os
+from dotenv import load_dotenv
+import logging
 from .models import Order, OrderItem
 from cart.models import Cart
 from .forms import OrderForm
@@ -7,11 +12,12 @@ from django.shortcuts import get_object_or_404, render, redirect
 from aiogram import Bot
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.enums import ParseMode
-import asyncio
-import os
-from dotenv import load_dotenv
 
-# Cargar variables de entorno
+
+# Настройка логирования
+logger = logging.getLogger(__name__)
+
+# Загрузка переменных окружения
 load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
@@ -28,29 +34,29 @@ def create_order(request):
             order = form.save(commit=False)
             order.user = request.user
 
-            # Calcular total
+            # Рассчитайте общую сумму
             total = 0
             for item in cart.items.select_related('product'):
                 total += item.product.price * item.quantity
             order.total = total
             order.save()
 
-            # Crear OrderItems con la imagen del producto
+            # Создание OrderItems с изображением товара
             for item in cart.items.select_related('product'):
                 if item.product.image:
                     image_url = item.product.image.url
                 else:
                     image_url = ''
-                print(f"Guardando OrderItem: Producto={item.product.name}, Imagen={image_url}")  # Debug
+                print(f"Создание OrderItem: Producto={item.product.name}, Imagen={image_url}")  # Debug
                 OrderItem.objects.create(
                     order=order,
                     product=item.product,
                     quantity=item.quantity,
                     price=item.product.price,
-                    product_image=image_url  # Guardar la URL de la imagen
+                    product_image=image_url  # Сохранить URL-адрес изображения
                 )
 
-            # (Opcional) Limpiar el carrito después de crear el pedido
+            # Очистить корзину после создания заказа
             cart.items.all().delete()
 
             return redirect('orders:order_confirm', order_id=order.id)
@@ -61,18 +67,16 @@ def create_order(request):
         return render(request, 'orders/order_form.html', {'form': form})
 
 async def send_telegram_notification(order):
-    """
-    Enviar notificación del pedido por Telegram.
-    """
+    """ Отправка уведомления о заказе в Telegram с изображениями."""
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        raise ValueError("El TOKEN o el CHAT_ID no están configurados.")
+        raise ValueError("TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены")
 
     bot = Bot(
         token=TELEGRAM_BOT_TOKEN,
         default=DefaultBotProperties(parse_mode=ParseMode.HTML)
     )
 
-    # Formatea el mensaje con la información del pedido
+    # Формат сообщения с информацией о заказе
     message = (
         f"📦 Новый заказ #{order.id}!\n"
         f"📍 Адрес доставки: {order.address}\n"        
@@ -99,7 +103,7 @@ def order_confirm(request, order_id):
         try:
             asyncio.run(send_telegram_notification(order))
         except Exception as e:
-            print(f"Error enviando notificación: {e}")
+            print(f"Ошибка при отправке уведомления: {e}")
 
         return redirect('orders:order_success', order_id=order.id)
 

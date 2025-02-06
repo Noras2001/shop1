@@ -1,12 +1,11 @@
 {% extends "catalog/base.html" %}
 
-
 {% block content %}
 <h2>Личный кабинет</h2>
 <p>Привет, {{ user.username }}!</p>
 <p>Твой телефон: {{ user.phone }}</p>
 
-<!-- Botón/Enlace para elegir un ramo -->
+<!-- Кнопка/ссылка для выбора букета -->
 <a href="{% url 'catalog:product_list' %}" class="btn btn-primary">
     Выбрать букет
 </a>

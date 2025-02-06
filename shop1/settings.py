@@ -14,20 +14,22 @@ import environ
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-# Define BASE_DIR como un objeto Path
+'''
+Пути сборки внутри проекта выглядят следующим образом: BASE_DIR / 'subdir'.
+Определите BASE_DIR как объект Path
+'''
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Inicializar environ
+# Инициализировать среду
 env = environ.Env(
-    DEBUG=(bool, False)  # Valor por defecto de DEBUG
+    DEBUG=(bool, False)  # Значение по умолчанию DEBUG=False
 )
 
-# Leer el archivo .env
+# Прочитать .env
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
-# Configurar las variables de entorno
+# Установка переменных окружения
 DEBUG = env('DEBUG')
 TELEGRAM_BOT_TOKEN = env('TELEGRAM_BOT_TOKEN')
 TELEGRAM_CHAT_ID = env('TELEGRAM_CHAT_ID')
@@ -37,12 +39,16 @@ TELEGRAM_CHAT_ID = env('TELEGRAM_CHAT_ID')
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-1%*mqicjjlx4gk5iuie4t!ktw42vu!y087z27v20r(d13o3pe@'#'DJANGO_SECRET_KEY'
+SECRET_KEY = 'DJANGO_SECRET_KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost']
+
+
+
 
 
 # Application definition
@@ -140,7 +146,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -157,28 +163,25 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 SITE_ID = 1
 
-#LOGIN_REDIRECT_URL = '/'
-LOGIN_REDIRECT_URL = '/user/profile/'
+
+#LOGIN_REDIRECT_URL = '/user/profile/'
+LOGIN_REDIRECT_URL = '/'
+
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'filename': BASE_DIR / 'error.log',
         },
     },
     'loggers': {
         'django': {
             'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-        'orders': {  # Asegúrate de que 'orders' coincide con el nombre de tu aplicación
-            'handlers': ['file'],
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'propagate': True,
         },
     },

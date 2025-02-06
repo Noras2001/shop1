@@ -7,8 +7,8 @@ User = get_user_model()
 @pytest.mark.django_db
 def test_phone_validation():
     """
-    Verifica que el campo phone no acepte valores inválidos.
+    Мы проверяем, что поле телефона не принимает недопустимых значений.
     """
     user = User(username="invalidphone", phone="invalid")
     with pytest.raises(ValidationError):
-        user.full_clean()  # Valida el modelo
+        user.full_clean()  # Проверяет модель

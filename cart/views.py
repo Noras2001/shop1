@@ -12,20 +12,19 @@ def update_cart_item(request, item_id):
             cart_item.quantity = int(new_quantity)
             cart_item.save()
         else:
-            # Si la cantidad es 0 o negativa, puedes eliminar el item
+            # Если количество равно 0 или отрицательно, удалить элемент.
             cart_item.delete()
 
     return redirect('cart:cart_detail')
 
-
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
-    # Obtener el carrito actual (si no existe, crearlo)
-    # Aquí asumimos que el usuario está logueado:
+    # Получить текущую корзину (если она не существует, создайте ее)
+    # Здесь мы предполагаем, что пользователь вошел в систему:
     cart, created = Cart.objects.get_or_create(user=request.user)
 
-    # Buscar si el ítem ya está en el carrito
+    # Проверка, не добавлен ли уже товар в корзину
     cart_item, item_created = CartItem.objects.get_or_create(
         cart=cart,
         product=product
@@ -35,6 +34,7 @@ def add_to_cart(request, product_id):
         cart_item.save()
 
     return redirect('cart:cart_detail')
+
 
 def cart_detail(request):
     cart = None

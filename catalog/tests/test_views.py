@@ -6,14 +6,14 @@ from catalog.models import Product, Category
 @pytest.fixture
 def category(db):
     """
-    Crea una categoría para usar en pruebas.
+    Создайте категорию для использования при тестировании.
     """
     return Category.objects.create(name="Flores", slug="flores")
 
 @pytest.fixture
 def product(db, category):
     """
-    Crea un producto asociado a una categoría.
+    Создание продукта, связанного с категорией.
     """
     return Product.objects.create(
         category=category,
@@ -29,10 +29,10 @@ def product(db, category):
 @pytest.mark.django_db
 def test_view_catalog(client, product):
     """
-    Verifica que la vista del catálogo responde correctamente
-    y contiene información del producto.
+    Убедитесь, что представление каталога отвечает правильно
+    и содержит информацию о продукте.
     """
-    url = reverse('catalog:product_list')  # Ajusta según tu configuración de URLs
+    url = reverse('catalog:product_list')  # Настройте в соответствии с конфигурацией вашего URL
     response = client.get(url)
 
     assert response.status_code == 200

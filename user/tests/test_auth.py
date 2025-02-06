@@ -7,7 +7,7 @@ User = get_user_model()
 @pytest.mark.django_db
 def test_user_authentication(user):
     """
-    Verifica que un usuario puede autenticarse con credenciales válidas.
+    Проверяет, может ли пользователь пройти аутентификацию с действительными учетными данными.
     """
     authenticated_user = authenticate(username="testuser", password="password")
     assert authenticated_user is not None
@@ -16,7 +16,7 @@ def test_user_authentication(user):
 @pytest.mark.django_db
 def test_user_authentication_invalid_password(user):
     """
-    Verifica que un usuario no puede autenticarse con una contraseña incorrecta.
+    Проверяет, что пользователь не может пройти аутентификацию с неправильным паролем.
     """
     authenticated_user = authenticate(username="testuser", password="wrongpassword")
     assert authenticated_user is None

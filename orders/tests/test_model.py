@@ -1,5 +1,5 @@
-from django.core.exceptions import ValidationError
 import pytest
+from django.core.exceptions import ValidationError
 from orders.models import Order, OrderItem
 from catalog.models import Product, Category
 from django.contrib.auth import get_user_model
@@ -41,7 +41,6 @@ def order(db, user):
 @pytest.fixture
 def order_item(db, order, product):
     return OrderItem.objects.create(order=order, product=product, quantity=2, price=200.00)
-
 
 
 # Тесты для модели Order
