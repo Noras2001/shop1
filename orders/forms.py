@@ -2,7 +2,7 @@ from django import forms
 from .models import Order
 from datetime import datetime
 from django.utils import timezone
-
+from django.contrib.auth import get_user_model
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -34,9 +34,36 @@ class OrderForm(forms.ModelForm):
             'email': 'Email',
             'payment_method': 'Способ оплаты',
         }
+
         help_texts = {
             'address': 'Укажите точный адрес доставки',
+            'phone': 'Ваш номер телефона для связи',
+            'delivery_time': 'Укажите точное время доставки',
         }
+
+    def __init__(self, *args, **kwargs):
+        """
+        Инициализация формы для подтягивания номера телефона пользователя
+        если он уже залогинен.
+        """
+        super().__init__(*args, **kwargs)
+        # Проверяем, если пользователь залогинен
+        if self.user_is_authenticated():
+            user = self.get_authenticated_user()
+            # Если номер телефона есть у пользователя, подтягиваем его в форму
+            if user.phone:
+                self.fields['phone'].initial = user.phone
+            self.fields['phone'].required = True
+            self.fields['address'].required = True
+            self.fields['delivery_time'].required = True
+
+    def user_is_authenticated(self):
+        """Проверка, залогинен ли пользователь."""
+        return hasattr(self, 'user') and self.user.is_authenticated
+
+    def get_authenticated_user(self):
+        """Получаем залогированного пользователя."""
+        return get_user_model().objects.get(username=self.user.username)
 
     def clean_delivery_date(self):
         """

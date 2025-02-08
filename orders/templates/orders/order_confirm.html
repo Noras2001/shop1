@@ -13,6 +13,9 @@
         <p>Проверьте данные заказа перед подтверждением.</p>
       {% endif %}
 
+      <p><strong>Телефон:</strong> {{ order.phone }}</p>
+      <p><strong>Email:</strong> {{ order.email }}</p>
+
       <p><strong>Адрес доставки:</strong> {{ order.address }}</p>
       <p><strong>Дата:</strong> {{ order.delivery_date }}</p>
       <p><strong>Время:</strong> {{ order.delivery_time }}</p>
@@ -28,9 +31,9 @@
               {% else %}
                 <img src="{% static 'images/default_product.jpg' %}" alt="Нет изображения" class="img-thumbnail me-3" style="width: 100px; height: auto;">
               {% endif %}
-              <span>{{ item.quantity }} x {{ item.product.name }}</span>
+              <span>{{ item.product.name }}       {{ item.quantity }} x {{ item.price }}</span>
             </div>
-            <span>{{ item.price }} ₽</span>
+            <span>{{ total|floatformat:2 }} ₽</span>
           </li>
         {% endfor %}
       </ul>
