@@ -1,7 +1,13 @@
-<!-- detail.html -->
 {% extends "catalog/base.html" %}
 
 {% block content %}
+<style>
+    header {
+        background: url('/media/header.png') no-repeat center center;
+        background-size: cover;
+        height: 250px; /* Узкая полоса вместо полного экрана */
+    }
+</style>
 <div class="container py-4">
   <div class="row">
     <div class="col-md-6 text-center">
@@ -10,6 +16,7 @@
         <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid mb-3" style="max-width: 100%; height: auto;">
       {% endif %}
     </div>
+    
     <div class="col-md-6">
       <p class="mb-2">{{ product.description }}</p>
       <h4 class="text-success">Цена: {{ product.price }} ₽</h4>

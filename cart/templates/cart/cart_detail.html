@@ -1,6 +1,13 @@
 {% extends "catalog/base.html" %}
 
 {% block content %}
+<style>
+  header {
+      background: url('/media/header.png') no-repeat center center;
+      background-size: cover;
+      height: 250px; /* Узкая полоса вместо полного экрана */
+  }
+</style>
 <div class="container py-4">
   <h2 class="mb-4 text-center">Ваша корзина</h2>
   <div class="card mx-auto" style="max-width: 800px;">

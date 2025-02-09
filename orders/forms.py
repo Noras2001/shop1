@@ -7,39 +7,7 @@ from django.contrib.auth import get_user_model
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = [
-            'address',
-            'delivery_date',
-            'delivery_time',
-            'comment',
-            'phone',
-            'email',
-            'payment_method',
-        ]
-        widgets = {
-            'delivery_date': forms.DateInput(
-                attrs={'type': 'date', 'min': timezone.localdate().isoformat()}
-            ),
-            'delivery_time': forms.TimeInput(
-                attrs={'type': 'time'}
-            ),
-        }
-
-        labels = {
-            'address': 'Адрес доставки',
-            'delivery_date': 'Дата доставки',
-            'delivery_time': 'Время доставки',
-            'comment': 'Комментарий',
-            'phone': 'Телефон',
-            'email': 'Email',
-            'payment_method': 'Способ оплаты',
-        }
-
-        help_texts = {
-            'address': 'Укажите точный адрес доставки',
-            'phone': 'Ваш номер телефона для связи',
-            'delivery_time': 'Укажите точное время доставки',
-        }
+        fields = ['address', 'delivery_date', 'delivery_time', 'comment']
 
     def __init__(self, *args, **kwargs):
         """

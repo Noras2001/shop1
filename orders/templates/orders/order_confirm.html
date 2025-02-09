@@ -13,8 +13,8 @@
         <p>Проверьте данные заказа перед подтверждением.</p>
       {% endif %}
 
-      <p><strong>Телефон:</strong> {{ order.phone }}</p>
-      <p><strong>Email:</strong> {{ order.email }}</p>
+      <p><strong>Телефон:</strong> {{ order.user.phone }}</p>
+      <p><strong>Email:</strong> {{ order.user.email }}</p>
 
       <p><strong>Адрес доставки:</strong> {{ order.address }}</p>
       <p><strong>Дата:</strong> {{ order.delivery_date }}</p>

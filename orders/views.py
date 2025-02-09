@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from .models import Order, OrderItem
+from user.models import CustomUser
 from cart.models import Cart
 from .forms import OrderForm
 from django.contrib.auth.decorators import login_required
@@ -84,8 +85,8 @@ async def send_telegram_notification(order):
         f"⏰ Время: {order.delivery_time}\n"
         f"✍️ Комментарий: {order.comment or 'нет'}\n"
         f"💰 Сумма: {order.total:.2f} руб.\n"
-        f"📞 Телефон: {order.phone}\n"
-        f"📧 Email: {order.email}\n"
+        f"📞 Телефон: {order.user.phone}\n"
+        f"📧 Email: {order.user.email}\n"
         f"Способ оплаты: {order.payment_method}\n"
     )
 
