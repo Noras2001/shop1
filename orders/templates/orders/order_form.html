@@ -1,3 +1,5 @@
+{% extends "catalog/base.html" %}
+
 {% block content %}
 <div class="container py-4">
   <h2 class="mb-4 text-center">Оформление заказа (Шаг 1)</h2>
@@ -6,8 +8,40 @@
       <form method="post" class="needs-validation" novalidate>
         {% csrf_token %}
         
-        {{ form.as_p }}  
+        <div class="mb-3">
+          <label for="id_address" class="form-label">Адрес доставки</label>
+          {{ form.address }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_phone" class="form-label">Телефон</label>
+          <input type="tel" id="id_phone" name="phone" class="form-control" value="{{ user.phone }}" readonly>
+        </div>
         
+                
+        <div class="mb-3">
+          <label for="id_delivery_date" class="form-label">Дата доставки</label>
+          {{ form.delivery_date }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_delivery_time" class="form-label">Время доставки</label>
+          {{ form.delivery_time }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_comment" class="form-label">Комментарий</label>
+          {{ form.comment }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_payment_method" class="form-label">Способ оплаты</label>
+          <select id="id_payment_method" name="payment_method" class="form-select">
+            <option value="card">Картой</option>
+            <option value="cash">Наличными</option>
+          </select>
+        </div>
+
         <div class="d-grid gap-2">
           <button type="submit" class="btn btn-primary btn-lg">Продолжить</button>
         </div>
@@ -16,4 +50,6 @@
   </div>
 </div>
 {% endblock %}
+
+
 

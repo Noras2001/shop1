@@ -1,19 +1,14 @@
 # shop1/orders/views.py
-import asyncio
 import os
-from dotenv import load_dotenv
 import logging
+from dotenv import load_dotenv
+import telebot
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, render, redirect
 from .models import Order, OrderItem
 from user.models import CustomUser
 from cart.models import Cart
 from .forms import OrderForm
-from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.shortcuts import get_object_or_404, render, redirect
-from aiogram import Bot
-from aiogram.client.bot import DefaultBotProperties
-from aiogram.enums import ParseMode
-
 
 # Настройка логирования
 logger = logging.getLogger(__name__)
@@ -22,6 +17,9 @@ logger = logging.getLogger(__name__)
 load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
+# Инициализация Telebot
+bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
 @login_required
 def create_order(request):
@@ -36,25 +34,19 @@ def create_order(request):
             order.user = request.user
 
             # Рассчитайте общую сумму
-            total = 0
-            for item in cart.items.select_related('product'):
-                total += item.product.price * item.quantity
+            total = sum(item.product.price * item.quantity for item in cart.items.select_related('product'))
             order.total = total
             order.save()
 
             # Создание OrderItems с изображением товара
             for item in cart.items.select_related('product'):
-                if item.product.image:
-                    image_url = item.product.image.url
-                else:
-                    image_url = ''
-                print(f"Создание OrderItem: Producto={item.product.name}, Imagen={image_url}")  # Debug
+                image_url = item.product.image.url if item.product.image else ''
                 OrderItem.objects.create(
                     order=order,
                     product=item.product,
                     quantity=item.quantity,
                     price=item.product.price,
-                    product_image=image_url  # Сохранить URL-адрес изображения
+                    product_image=image_url
                 )
 
             # Очистить корзину после создания заказа
@@ -67,20 +59,15 @@ def create_order(request):
         form = OrderForm()
         return render(request, 'orders/order_form.html', {'form': form})
 
-async def send_telegram_notification(order):
+def send_telegram_notification(order):
     """ Отправка уведомления о заказе в Telegram с изображениями."""
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        raise ValueError("TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены")
+        logger.error("TELEGRAM_BOT_TOKEN или TELEGRAM_CHAT_ID не настроены")
+        return
 
-    bot = Bot(
-        token=TELEGRAM_BOT_TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
-    )
-
-    # Формат сообщения с информацией о заказе
     message = (
         f"📦 Новый заказ #{order.id}!\n"
-        f"📍 Адрес доставки: {order.address}\n"        
+        f"📍 Адрес доставки: {order.address}\n"
         f"📅 Дата: {order.delivery_date}\n"
         f"⏰ Время: {order.delivery_time}\n"
         f"✍️ Комментарий: {order.comment or 'нет'}\n"
@@ -90,26 +77,27 @@ async def send_telegram_notification(order):
         f"Способ оплаты: {order.payment_method}\n"
     )
 
-    await bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
-
+    try:
+        bot.send_message(TELEGRAM_CHAT_ID, message)
+    except Exception as e:
+        logger.error(f"Ошибка при отправке уведомления в Telegram: {e}")
 
 @login_required
 def order_confirm(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
-
+    
     if request.method == 'POST':
         order.is_confirmed = True
         order.save()
 
         try:
-            asyncio.run(send_telegram_notification(order))
+            send_telegram_notification(order)
         except Exception as e:
-            print(f"Ошибка при отправке уведомления: {e}")
+            logger.error(f"Ошибка при отправке уведомления: {e}")
 
         return redirect('orders:order_success', order_id=order.id)
 
     return render(request, 'orders/order_confirm.html', {'order': order})
-
 
 @login_required
 def order_success(request, order_id):

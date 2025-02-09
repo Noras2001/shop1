@@ -24,6 +24,7 @@ class OrderForm(forms.ModelForm):
             self.fields['phone'].required = True
             self.fields['address'].required = True
             self.fields['delivery_time'].required = True
+            self.fields['payment_method'].required = True
 
     def user_is_authenticated(self):
         """Проверка, залогинен ли пользователь."""

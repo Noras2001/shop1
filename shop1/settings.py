@@ -42,7 +42,7 @@ TELEGRAM_CHAT_ID = env('TELEGRAM_CHAT_ID')
 SECRET_KEY = 'DJANGO_SECRET_KEY'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False #True False
+DEBUG = True#True False
 ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 # CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost']
